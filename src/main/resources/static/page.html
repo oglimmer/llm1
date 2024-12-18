@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Source code dev chat</title>
+    <style>
+        #chat-log {
+            width: 95%;
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        #message-input {
+            width: 90%;
+            height: 30px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<h1>Source code dev chat</h1>
+
+<div id="chat-log">
+    <!-- Messages will be displayed here -->
+</div>
+
+<input type="text" id="message-input" placeholder="Your question... (e.g. `summarize the class SomeClass`)">
+
+<button onclick="sendMessage()">Ask a question</button>
+
+
+<script>
+    const domainWithPort = `${window.location.hostname}:${window.location.port}`;
+    const isHttps = window.location.protocol === 'https:' ? "s" : "";
+    const socket = new WebSocket(`ws${isHttps}://${domainWithPort}/api/communication-start`);
+    socket.onmessage = (event) => {
+        handleIncomingMessage(event.data);
+    };
+
+    function handleIncomingMessage(message) {
+        console.log(message);
+        message = message.replaceAll("\n", "<br/>");
+        document.getElementById("chat-log").innerHTML += message;
+        document.getElementById("chat-log").scrollTop = document.getElementById("chat-log").scrollHeight;
+    }
+
+    function sendMessage() {
+        const messageInput = document.getElementById("message-input");
+        const message = messageInput.value.trim();
+
+        socket.send(message)
+
+        // if (message) {
+        //     fetch('/send-message', {method: 'GET'})
+        //         .then(response => response.text())
+        //         .then(message => {
+        //             console.log("send ok")
+        //         })
+        //         .catch(error => console.error('Error sending message:', error));
+        // }
+    }
+</script>
+</body>
+</html>
