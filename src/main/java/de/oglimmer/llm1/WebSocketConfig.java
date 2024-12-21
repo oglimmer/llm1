@@ -1,6 +1,6 @@
 package de.oglimmer.llm1;
 
-import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -11,18 +11,19 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 
 @Configuration
 @EnableWebSocket
-@AllArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
 
-    private AiCommunicationHandler aiCommunicationHandler;
+    private final AiCommunicationHandler aiCommunicationHandler;
+
+    public WebSocketConfig(@NonNull AiCommunicationHandler aiCommunicationHandler) {
+        this.aiCommunicationHandler = aiCommunicationHandler;
+    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(aiCommunicationHandler, "/api/communication-start")
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
-                .setAllowedOrigins("*")
-        ;
-
+                .setAllowedOrigins("*");
     }
 
     @Bean

@@ -1,0 +1,27 @@
+services:
+  server:
+    build: .
+    volumes:
+      - ./data:/mnt/data
+    environment:
+      - SOURCE_CODE_ROOT=/mnt/data
+      - MODEL_NAME=llama3.2:3b
+      - SPRING_PROFILES_ACTIVE=ollama
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.llm-http.rule=Host(`${DOMAIN_NAME:-llm.oglimmer.com}`)"
+      - "traefik.http.routers.llm-http.entrypoints=websecure"
+      - "traefik.http.routers.llm-http.tls=true"
+      - "traefik.http.routers.llm-http.tls.certresolver=letsencrypt"
+    networks:
+      - md_default
+    ports:
+      - 8888:8888
+  ollama:
+    image: ollama/ollama
+    networks:
+      - md_default
+
+networks:
+  md_default:
+    external: true

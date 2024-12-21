@@ -1,8 +1,11 @@
 package de.oglimmer.llm1;
 
 import de.oglimmer.llm1.llm.AiService;
+import de.oglimmer.llm1.llm.OllamaAiService;
+import de.oglimmer.llm1.llm.OpenAiService;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -14,11 +17,15 @@ import java.util.Map;
 
 @Getter
 @Component
-@RequiredArgsConstructor
+@Slf4j
 public class AiCommunicationHandler extends TextWebSocketHandler {
 
+    private AiService aiService;
     private final Map<String, WebSocketSession> sessions = new HashMap<>();
-    private final AiService aiService;
+
+    public AiCommunicationHandler(@NonNull OllamaAiService aiService) {
+        this.aiService = aiService;
+    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
@@ -32,7 +39,7 @@ public class AiCommunicationHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
-        System.out.println(message.getPayload());
+        log.debug(message.getPayload());
         aiService.doAi(message.getPayload(), session);
     }
 
